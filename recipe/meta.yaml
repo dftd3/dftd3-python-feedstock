@@ -8,14 +8,26 @@ package:
 source:
   url: https://github.com/awvwgk/simple-dftd3/archive/refs/tags/v{{ version }}.tar.gz
   sha256: 47b2614c911085690075dda5af70391c93d9a43fe067eae15bb6db72eac33aab
+  patches:
+    - python-version.patch
 
 build:
-  number: 0
-  skip: true  # [win or (osx and (python_impl == 'cpython' and py<38))]
+  number: 1
+  skip: true  # [osx and (python_impl == 'cpython' and py<38)]
+  skip: true  # [(not x86_64 and linux) and (python_impl == 'cpython' and py==39)]
+  script:
+    - set -ex  # [unix]
+    - cd python
+    - meson setup _build ${MESON_ARGS:---prefix=${PREFIX} --libdir=lib} --buildtype=release -Dpython_version=$BUILD_PREFIX/bin/python3  # [unix]
+    - meson setup _build --prefix=%PREFIX% --buildtype=release --pkg-config-path=%PREFIX%\lib\pkgconfig -Dpython_version=%BUILD_PREFIX%\python.exe  # [win]
+    - meson compile -C _build
+    - meson install -C _build --no-rebuild
+    - copy %SRC_DIR%\assets\parameters.toml %PREFIX%\lib\site-packages\dftd3  # [win]
 
 requirements:
   build:
-    - {{ compiler('c') }}
+    - {{ compiler('c') }}  # [unix]
+    - {{ compiler('m2w64_c') }}  # [win]
     - meson
     - python
     - cffi
@@ -24,7 +36,7 @@ requirements:
     - python
     - pip
     - simple-dftd3
-    - libblas
+    - libblas  # [unix]
   run:
     - python
     - cffi
@@ -41,7 +53,7 @@ test:
     - qcelemental
     - ase
   commands:
-    - pytest --pyargs dftd3 -vv
+    - pytest --pyargs dftd3 -vv  # [build_platform == target_platform]
 
 about:
   home: https://github.com/awvwgk/simple-dftd3/tree/main/python
