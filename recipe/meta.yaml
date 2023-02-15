@@ -1,46 +1,39 @@
 {% set name = "dftd3-python" %}
-{% set version = "0.6.0" %}
+{% set version = "0.7.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/awvwgk/simple-dftd3/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 4bef311f8e5a2c32141eddeea65615c3c8480f917cd884488ede059fb0962a50
+  url: https://github.com/dftd3/simple-dftd3/archive/refs/tags/v{{ version }}.tar.gz
+  sha256: 19400a176eb4dcee7b89181a5a5f0033fe6b05c52821e54896a98448761d003a
 
 build:
-  number: 1
-  skip: true  # [osx and (python_impl == 'cpython' and py<38)]
-  script:
-    - set -ex  # [unix]
-    - cd python
-    - >
-       meson setup _build
-       ${MESON_ARGS:---prefix=${PREFIX} --libdir=lib}  # [unix]
-       --prefix=%PREFIX% --pkg-config-path=%LIBRARY_PREFIX%\lib\pkgconfig;%PREFIX%\lib\pkgconfig  # [win]
-       --buildtype=release -Dpython_version={{ PYTHON }}
-    - meson compile -C _build
-    - meson install -C _build --no-rebuild
-    - copy %SRC_DIR%\assets\parameters.toml %PREFIX%\lib\site-packages\dftd3  # [win]
+  number: 0
+  skip: true  # [win]
 
 requirements:
   build:
     - {{ compiler('c') }}  # [unix]
     - {{ compiler('m2w64_c') }}  # [win]
-    - meson
-    - python
-    - pkg-config
+    - cffi                                # [build_platform != target_platform]
+    - cross-python_{{ target_platform }}  # [build_platform != target_platform]
+    - meson                               # [build_platform != target_platform]
+    - pkg-config                          # [build_platform != target_platform]
+    - python                              # [build_platform != target_platform]
   host:
-    - python
     - cffi
-    - pip
-    - simple-dftd3 >={{ version }}
     - libblas  # [unix]
-  run:
+    - meson
+    - pkg-config
+    - pip
     - python
+    - simple-dftd3 >={{ version }}
+  run:
     - cffi
     - numpy
+    - python
 
 
 test:
@@ -57,8 +50,6 @@ test:
     - qcelemental
     - ase
     - tomli
-  commands:
-    - pytest --pyargs dftd3 -vv  # [build_platform == target_platform and py<=39]
 
 about:
   home: https://github.com/awvwgk/simple-dftd3/tree/main/python
