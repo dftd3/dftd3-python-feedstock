@@ -47,11 +47,11 @@ test:
     - dftd3.interface
     - dftd3.parameters
     - dftd3.ase
-    - dftd3.qcschema
+    - dftd3.qcschema  # [py<313]
   requires:
     - pytest
     - setuptools
-    - qcelemental
+    - qcelemental  # [py<313]
     - ase
     - tomli
 
