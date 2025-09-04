@@ -25,6 +25,7 @@ requirements:
     - pkg-config
     - python                              # [build_platform != target_platform]
     - python-build                        # [build_platform != target_platform]
+    - setuptools                          # [build_platform != target_platform]
   host:
     - cffi
     - meson
@@ -32,6 +33,7 @@ requirements:
     - pip
     - python
     - python-build
+    - setuptools
     - simple-dftd3 >={{ version }}
   run:
     - cffi
