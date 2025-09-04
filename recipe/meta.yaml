@@ -10,7 +10,7 @@ source:
   sha256: 3a12c04c490badc63054aca18ea7670d416fcc2152cfe9b8af220da57c39f942
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -25,6 +25,7 @@ requirements:
     - pkg-config
     - python                              # [build_platform != target_platform]
     - python-build                        # [build_platform != target_platform]
+    - setuptools                          # [build_platform != target_platform]
   host:
     - cffi
     - meson
@@ -32,6 +33,7 @@ requirements:
     - pip
     - python
     - python-build
+    - setuptools
     - simple-dftd3 >={{ version }}
   run:
     - cffi
